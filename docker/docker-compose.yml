@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  health_app:
+    container_name: health_app
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    command: sh -c "pip install -r requirements.txt && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ../:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - health_app_db
+    environment:
+      POSTGRES_DB: health_app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    restart: always
+
+  health_app_db:
+    container_name: health_app_db
+    image: postgres:latest
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: health_app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    restart: always
